@@ -5,7 +5,6 @@ date: "5/6/2017"
 output: html_document
 ---
 ```{r}
-library(googlesheets)
 library(tidyverse)
 ```
 ```{r}
@@ -25,14 +24,19 @@ summary(workouts)
 ```{r}
 #create some stats, print to console
 active_days <- as.numeric(nrow(workouts[unique(workouts$Date), ]))
-rest_days <- as.numeric((as.Date("2017-04-17") - min(workouts$Date)) - 97)
+rest_days <- as.numeric((as.Date("2017-04-17") - min(workouts$Date)) - active_days)
 runs <- workouts %>% filter(Activity == "run") 
+mileage <- sum(runs$Distance_miles)
 avg_run_pace <- round(mean(runs$Pace[!is.na(runs$Pace)]), 2)
 avg_min_mile <- round(mean(runs$min_per_mile[!is.na(runs$min_per_mile)]), 0)
+table(tolower(workouts$Stretch))
+table(tolower(workouts$Indoor_outdoor))
+table(tolower(workouts$Location))
 
 print(paste0("Active: ", active_days))
 print(paste0("Rest: ", rest_days))
-print(paste0("Average run pace of ", avg_run_pace, " mph or roughly ", avg_min_mile, " minutes pre mile."))
+print(paste0("Total Running Mileage: ", mileage))
+print(paste0("Average run pace of ", avg_run_pace, " mph or roughly ", avg_min_mile, " minutes per mile."))
 ```
 
 ```{r}
@@ -40,7 +44,7 @@ table(workouts$Activity)
 ```
 
 ```{r}
-ggplot(workouts, aes(Activity, fill = Activity)) +
+plot1 <- ggplot(workouts, aes(Activity, fill = Activity)) +
   geom_bar(stat = "count") +
   theme_light() +
   scale_y_continuous(expand = c(0, 0)) +
@@ -48,4 +52,6 @@ ggplot(workouts, aes(Activity, fill = Activity)) +
         legend.position = "None") +
   scale_fill_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99")) +
   labs(title = "Breakdown of Training Activity Days")
+
+ggsave("~/Downloads/marathon.png", plot = plot1)
 ```
